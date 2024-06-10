@@ -1,10 +1,31 @@
-import { Form } from "react-router-dom";
+import {
+	Form,
+	useNavigation,
+	useNavigate,
+	useActionData,
+} from 'react-router-dom';
 
-import classes from "./EventForm.module.css";
+import classes from './EventForm.module.css';
 
 function EventForm({ method, event }) {
+	const data = useActionData();
+
+	const navigation = useNavigation();
+	const isSubmitting = navigation.state === 'submitting';
+
+	const navigate = useNavigate();
+	function cancelHandler() {
+		navigate('..');
+	}
 	return (
 		<Form method='post' className={classes.form}>
+			{data && data.errors && (
+				<ul>
+					{Object.values(data.errors).map((err) => (
+						<li key={err}>{err}</li>
+					))}
+				</ul>
+			)}
 			<p>
 				<label htmlFor='title'>Title</label>
 				<input
@@ -12,7 +33,7 @@ function EventForm({ method, event }) {
 					type='text'
 					name='title'
 					required
-					defaultValue={event ? event.title : ""}
+					defaultValue={event ? event.title : ''}
 				/>
 			</p>
 			<p>
@@ -22,7 +43,7 @@ function EventForm({ method, event }) {
 					type='url'
 					name='image'
 					required
-					defaultValue={event ? event.image : ""}
+					defaultValue={event ? event.image : ''}
 				/>
 			</p>
 			<p>
@@ -32,7 +53,7 @@ function EventForm({ method, event }) {
 					type='date'
 					name='date'
 					required
-					defaultValue={event ? event.date : ""}
+					defaultValue={event ? event.date : ''}
 				/>
 			</p>
 			<p>
@@ -42,12 +63,16 @@ function EventForm({ method, event }) {
 					name='description'
 					rows='5'
 					required
-					defaultValue={event ? event.description : ""}
+					defaultValue={event ? event.description : ''}
 				/>
 			</p>
 			<div className={classes.actions}>
-				<button type='button'>Cancel</button>
-				<button>Save</button>
+				<button type='button ' onClick={cancelHandler} disabled={isSubmitting}>
+					Cancel
+				</button>
+				<button disabled={isSubmitting}>
+					{isSubmitting ? 'Submitting...' : 'Save'}
+				</button>
 			</div>
 		</Form>
 	);
